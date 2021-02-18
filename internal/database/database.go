@@ -3,9 +3,9 @@ package database
 import (
 	"fmt"
 	"log"
-	"os/user"
 
 	"github.com/lucabecci/questions-golang-API/pkg/question"
+	"github.com/lucabecci/questions-golang-API/pkg/user"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"

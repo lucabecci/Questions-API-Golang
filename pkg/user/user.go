@@ -6,6 +6,7 @@ import (
 	"gorm.io/gorm"
 )
 
+//User is the main struct of the table
 type User struct {
 	gorm.Model
 	ID        uint `gorm:"primaryKey"`
