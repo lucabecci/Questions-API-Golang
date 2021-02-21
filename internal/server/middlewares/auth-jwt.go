@@ -3,18 +3,22 @@ package middlewares
 import (
 	"os"
 
-	"github.com/gofiber/fiber"
-	jwtware "github.com/gofiber/jwt"
+	"github.com/gofiber/fiber/v2"
+	jwtware "github.com/gofiber/jwt/v2"
 )
 
-func jwtAuth() func(ctx *fiber.Ctx) {
-	jwtSecret := os.Getenv("JWT_KEY")
+func Protected() fiber.Handler {
 	return jwtware.New(jwtware.Config{
-		ErrorHandler: func(ctx *fiber.Ctx, err error) {
-			ctx.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
-				"error": "Unauthorized",
-			})
-		},
-		SigningKey: []byte(jwtSecret),
+		ErrorHandler: jwtError,
+		SigningKey:   []byte(os.Getenv("JWT_KEY")),
 	})
+}
+
+func jwtError(c *fiber.Ctx, err error) error {
+	if err.Error() == "Missing or malformed JWT" {
+		return c.Status(fiber.StatusBadRequest).
+			JSON(fiber.Map{"message": "Missing or malformed JWT"})
+	}
+	return c.Status(fiber.StatusUnauthorized).
+		JSON(fiber.Map{"message": "Invalid or expired JWT"})
 }

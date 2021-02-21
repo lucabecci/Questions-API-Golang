@@ -1,9 +1,13 @@
 package v1
 
 import (
+	"fmt"
+
+	"github.com/form3tech-oss/jwt-go"
 	"github.com/gofiber/fiber/v2"
 	"github.com/lucabecci/questions-golang-API/internal/database/data"
 	"github.com/lucabecci/questions-golang-API/internal/helpers"
+	"github.com/lucabecci/questions-golang-API/internal/server/middlewares"
 )
 
 type UserRouter struct {
@@ -54,11 +58,11 @@ func (ur *UserRouter) Login(c *fiber.Ctx) error {
 	if result == false {
 		return fiber.NewError(400, "Password invalid")
 	}
-
 	token, err := helpers.JwtGenerator(usr.ID)
 	if err != nil {
 		return fiber.NewError(500, "Internal Server Error")
 	}
+
 	c.Status(fiber.StatusOK).JSON(fiber.Map{
 		"token": token,
 		"user": struct {
@@ -72,10 +76,26 @@ func (ur *UserRouter) Login(c *fiber.Ctx) error {
 	return nil
 }
 
+func (ur *UserRouter) Account(c *fiber.Ctx) error {
+	c.Send([]byte(fmt.Sprint("Hello")))
+	user := c.Locals("user").(*jwt.Token)
+	claims := user.Claims.(jwt.MapClaims)
+	id := claims["user_id"].(float64)
+	usr, success := ur.Repository.GetOne(uint(id))
+	if success == false {
+		return fiber.NewError(500, "Internal server error")
+	}
+	c.Status(fiber.StatusOK).JSON(fiber.Map{
+		"message": "Hello " + usr.Email,
+	})
+	return nil
+}
+
 func (ur *UserRouter) Service() *fiber.App {
 	service := fiber.New()
 
 	service.Post("/register", ur.Register)
 	service.Post("/login", ur.Login)
+	service.Get("/account", middlewares.Protected(), ur.Account)
 	return service
 }
