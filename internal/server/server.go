@@ -6,7 +6,8 @@ import (
 	"log"
 	"time"
 
-	"github.com/gofiber/fiber"
+	"github.com/gofiber/fiber/v2"
+	v1 "github.com/lucabecci/questions-golang-API/internal/server/v1"
 )
 
 type Server struct {
@@ -18,7 +19,7 @@ type Versions struct {
 }
 
 func GetInstance() (*Server, error) {
-	app := fiber.New(&fiber.Settings{
+	app := fiber.New(fiber.Config{
 		CaseSensitive: true,
 		StrictRouting: true,
 		ServerHeader:  "Question",
@@ -27,7 +28,8 @@ func GetInstance() (*Server, error) {
 	})
 
 	//routes
-	app.Get("/index", Index)
+	v1 := v1.New()
+	app.Mount("/v1", v1)
 	//instance
 	server := Server{server: app}
 	//return srv
