@@ -32,6 +32,5 @@ FROM scratch
 
 COPY --from=builder /dist/main /
 
-
 # Command to run
 ENTRYPOINT ["/main"]
