@@ -1,9 +1,6 @@
 package v1
 
 import (
-	"fmt"
-
-	"github.com/form3tech-oss/jwt-go"
 	"github.com/gofiber/fiber/v2"
 	"github.com/lucabecci/questions-golang-API/internal/database/data"
 	"github.com/lucabecci/questions-golang-API/internal/helpers"
@@ -77,11 +74,11 @@ func (ur *UserRouter) Login(c *fiber.Ctx) error {
 }
 
 func (ur *UserRouter) Account(c *fiber.Ctx) error {
-	c.Send([]byte(fmt.Sprint("Hello")))
-	user := c.Locals("user").(*jwt.Token)
-	claims := user.Claims.(jwt.MapClaims)
-	id := claims["user_id"].(float64)
-	usr, success := ur.Repository.GetOne(uint(id))
+	uID, err := helpers.ConvertMetaData(c)
+	if err != nil {
+		return fiber.NewError(500, "Internal server error")
+	}
+	usr, success := ur.Repository.GetOne(uID)
 	if success == false {
 		return fiber.NewError(500, "Internal server error")
 	}
