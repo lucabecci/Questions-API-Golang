@@ -10,8 +10,11 @@ func New() *fiber.App {
 	router := fiber.New()
 	db := database.Database()
 	ur := UserRouter{Repository: data.UserRepository{Database: db}}
+	qr := QuestionRouter{Repository: data.QuestionRepository{Database: db}}
 	userRouter := ur.Service()
+	questionRouter := qr.Service()
 
 	router.Mount("/user", userRouter)
+	router.Mount("/question", questionRouter)
 	return router
 }

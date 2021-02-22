@@ -14,7 +14,7 @@ func ParseUint(value string) (uint, error) {
 }
 
 func ParseFloat(value float64) string {
-	str := strconv.FormatFloat(value, 'g', 1, 64)
+	str := strconv.FormatFloat(value, 'f', 0, 64)
 	strFinal := string(str)
 	return strFinal
 }

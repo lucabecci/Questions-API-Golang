@@ -3,7 +3,6 @@ package data
 import (
 	"errors"
 
-	"github.com/lucabecci/questions-golang-API/internal/database"
 	"github.com/lucabecci/questions-golang-API/pkg/question"
 	"github.com/lucabecci/questions-golang-API/pkg/user"
 	"gorm.io/gorm"
@@ -11,24 +10,6 @@ import (
 
 type UserRepository struct {
 	Database *gorm.DB
-}
-
-func GetInstance() *UserRepository {
-	userRepository := UserRepository{Database: database.Database()}
-	return &userRepository
-}
-
-func (u *UserRepository) GetAll() ([]user.User, bool) {
-	var users []user.User
-
-	rows := u.Database.Find(&users)
-
-	rows.Scan(&users)
-
-	if len(users) < 1 {
-		return []user.User{}, false
-	}
-	return users, true
 }
 
 func (u *UserRepository) GetOne(id uint) (user.User, bool) {
@@ -73,4 +54,13 @@ func (u *UserRepository) UserExists(email string) (user.User, error) {
 	}
 	return usr, nil
 
+}
+
+func (u *UserRepository) EmailInUse(email string) bool {
+	var usr user.User
+	result := u.Database.Where("email = ?", email).Find(&usr)
+	if result.RowsAffected == 1 {
+		return true
+	}
+	return false
 }

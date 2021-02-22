@@ -22,6 +22,10 @@ func (ur *UserRouter) Register(c *fiber.Ctx) error {
 	if err != nil {
 		return fiber.NewError(400, "Error in the camps")
 	}
+	exists := ur.Repository.EmailInUse(body.Email)
+	if exists == true {
+		return fiber.NewError(400, "Email already in use")
+	}
 	usr, succes := ur.Repository.Create(body.Email, body.Password)
 	if succes == false {
 		return fiber.NewError(400, "Error to create your account")
